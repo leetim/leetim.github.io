@@ -48,7 +48,7 @@
             // var data = canvas1.toDataURL('image/png');
             handleFiles(canvas1.toDataURL('image/png'));
         }
-        setInterval(takepicture, 150);
+        setInterval(takepicture, 41);
     	//Webcam.attach('#my_camera');
     </script>
 	<div class="spinner" id='spinner'></div>
@@ -69,6 +69,7 @@
   		var eye_cascade;
 		var smile_cascade;
 		var prev_key_points = null;
+		let frames = 0;
 
 		show_image = function (mat, canvas_id ){
 			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
@@ -114,7 +115,9 @@
 				ctx.drawImage(img, 0, 0, img.width * scaleFactor, img.height * scaleFactor);
 			}
 			img.src = url;
+			
 			brisk();
+			//brisk();
 		}
 
 		function getInput() {
@@ -131,30 +134,27 @@
 			cv.cvtColor(img, img_color, cv.ColorConversionCodes.COLOR_RGBA2RGB.value, 0);
 
 			img.delete();
-
-			// Initiate STAR detector
-			//var brisk = new cv.BRISK(50, 1, 3);
-			var orb = new cv.ORB(500, 1.2, 8, 31, 0, 2, 0, 31, 20);
-
-			// find the keypoints with ORB
-			var kp = new cv.KeyPointVector();
-			var des = new cv.Mat();
-			// brisk.detect(img_color, kp, des);
-			orb.detect(img_color, kp, des);
-
-			// compute the descriptors with ORB
-			// brisk.compute(img_color, kp, des);
-			orb.compute(img_color, kp, des);
-
-			// draw only keypoints location,not size and orientation
 			var img2 = new cv.Mat();
 			var color = new cv.Scalar(0,255,0);
 
-			// for (key in des){
-			// 	console.log(key + ' ' + des[key]);
-			// }
+			// Initiate STAR detector
+			//var brisk = new cv.BRISK(50, 1, 3);
+			if (frames++ % 8 == 0){
+				var orb = new cv.ORB(500, 1.2, 8, 31, 0, 2, 0, 31, 20);
 
-			cv.drawKeypoints(img_color, kp, img2, color, 0);
+			// find the keypoints with ORB
+				var kp = new cv.KeyPointVector();
+				var des = new cv.Mat();
+			// brisk.detect(img_color, kp, des);
+				orb.detect(img_color, kp, des);
+
+			// compute the descriptors with ORB
+			// brisk.compute(img_color, kp, des);
+				orb.compute(img_color, kp, des);
+
+			// draw only keypoints location,not size and orientation
+
+				cv.drawKeypoints(img_color, kp, img2, color, 0);
 			/*
 			if (prev_key_points != null) {
 				// var h = null;
@@ -169,13 +169,19 @@
 				other_color.delete();
 			}
 			*/
-			show_image(img2, "canvas2");
-			//prev_key_points = kp.clone();
-			kp.delete();
+				show_image(img2, "canvas2");
+				prev_key_points = kp.clone();
+				kp.delete();
+				orb.delete();
+				des.delete();
+			}
+			else {
+				cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
+				show_image(img2, "canvas2");
+			}
+
 			color.delete();
 			//brisk.delete();
-			orb.delete();
-			des.delete();
 			img_color.delete();
 			img2.delete();
 		}
