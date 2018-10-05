@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>OpenCV JS Binding - Image Processing Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+	</head>
+	<body>
+		<video id="video" class="videos" autoplay width="600" height="300" style="border: 1px solid #000;"></video>
+		<script>
+			var video = document.getElementById('video');
+
+        	if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            	navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                	video.src = window.URL.createObjectURL(stream);
+                	video.play();
+            	}, 
+      			function(err) {
+         			console.log("The following error occurred: " + err.name);
+      			});
+        	}
+        </script>
+	</body>
+</html>
