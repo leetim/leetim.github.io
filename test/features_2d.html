@@ -73,15 +73,16 @@
 	<canvas id="canvas3" style="display: none;"></canvas>
 
 	<button onclick="changeCamera()" class="btn btn-default btn-lg">Переключить камеру</button>
-	<br>
+	<br><br><br>
 	<input type="range" min="1" max="16" value="8" id="framesRange">
 	<p id="curFramesCnt"></p>
 
 	<script type="text/javascript">
-		$('#curFramesCnt').innerHTML = frameRange;
+		$('#curFramesCnt').test(frameRange);
 		$('#framesRange').on('change', function(){
 			frameRange = $('#framesRange').val();
-			$('#curFramesCnt').innerHTML = frameRange;			
+			$('#curFramesCnt').text(frameRange);
+			console.log(frameRange);			
 		});
 	</script>
 
