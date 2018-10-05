@@ -48,7 +48,7 @@
             // var data = canvas1.toDataURL('image/png');
             handleFiles(canvas1.toDataURL('image/png'));
         }
-        setInterval(takepicture, 4100);
+        setInterval(takepicture, 150);
     	//Webcam.attach('#my_camera');
     </script>
 	<div class="spinner" id='spinner'></div>
@@ -142,9 +142,6 @@
 
 			// compute the descriptors with ORB
 			brisk.compute(img_color, kp, des);
-
-			console.log('kp = ' + JSON.stringify(kp));
-			console.log('des = ' + JSON.stringify(des));
 
 			// draw only keypoints location,not size and orientation
 			var img2 = new cv.Mat();
