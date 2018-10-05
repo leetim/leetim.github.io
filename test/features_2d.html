@@ -69,8 +69,9 @@
   		var eye_cascade;
 		var smile_cascade;
 		var prev_key_points = null;
-		canvas2.clearReact(0, 0, width, height);
 
+		var ctxCanvas2 = canvas2.getContext('2d'); //e.target.files[0]
+		ctxCanvas2.clearReact(0, 0, width, height);
 		show_image = function (mat, canvas_id ){
 			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
 			channels = mat.channels();
@@ -109,7 +110,6 @@
 			var img = new Image();
 			img.onload = function() {
 				//ctx.drawImage(img, 20, 20);
-
 				var scaleFactor=Math.min((canvasWidth/img.width),(canvasHeight/img.height));
 				canvas.width = img.width*scaleFactor ;
 				canvas.height = img.height*scaleFactor ;
