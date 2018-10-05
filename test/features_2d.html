@@ -36,16 +36,16 @@
  			});
 		}
 
-		var width = 640;
+		var width = 300;
         var height = 480;
 
-        function clearphoto() {
-          	var context = canvas.getContext('2d');
-          	context.fillStyle = "#AAA";
-          	context.fillRect(0, 0, width, height);
+        // function clearphoto() {
+        //   	var context = canvas.getContext('2d');
+        //   	context.fillStyle = "#AAA";
+        //   	context.fillRect(0, 0, width, height);
 
-          	var data = canvas1.toDataURL('image/png');
-        }
+        //   	var data = canvas1.toDataURL('image/png');
+        // }
 
         function takepicture() {
           	var context = canvas1.getContext('2d');
@@ -67,7 +67,7 @@
 
 	<canvas id="canvas1" style="display: none;"></canvas>
 	<canvas id="canvas2"></canvas>
-	<canvas id="canvas3"></canvas>
+	<canvas id="canvas3" style="display: none;"></canvas>
 
 	<script src='dat.gui.js'></script>
 	<script async src="cv-wasm.js"></script>
@@ -156,6 +156,7 @@
 			var img2 = new cv.Mat();
 			var color = new cv.Scalar(0,255,0);
 			cv.drawKeypoints(img_color, kp, img2, color, 0);
+			/*
 			if (prev_key_points != null) {
 				// var h = null;
 				// findHomography(points1, points2, h);
@@ -168,14 +169,15 @@
 				prev_key_points.delete();
 				other_color.delete();
 			}
-
+			*/
 			show_image(img2, "canvas2");
-			prev_key_points = kp.clone();
+			//prev_key_points = kp.clone();
 			kp.delete();
 			color.delete();
 			brisk.delete();
 			des.delete();
 			img_color.delete();
+			img2.delete();
 		}
 
 		function download() {
