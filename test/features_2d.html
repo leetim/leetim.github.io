@@ -74,14 +74,15 @@
 	<canvas id="canvas3" style="display: none;"></canvas>
 
 	<button onclick="changeCamera()" class="btn btn-default btn-lg">Переключить камеру</button>
-	<br><br><br>
+	<br><br>
+	<h3 id="curFramesCnt" style="color: white;" align="center"></h3>
 	<input type="range" min="1" max="16" value="8" id="framesRange">
-	<p id="curFramesCnt"></p>
 
 	<script type="text/javascript">
 		$('#curFramesCnt').text(frameRange);
 		$('#framesRange').on('change', function(){
 			frameRange = $('#framesRange').val();
+			$('#curFramesCnt').text(frameRange);
 		});
 	</script>
 
@@ -397,7 +398,7 @@
       Module.setStatus('Downloading...');
       window.onerror = function(event) {
         // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
-        Module.setStatus('Exception thrown, see JavaScript console');
+        //Module.setStatus('Exception thrown, see JavaScript console');
         spinnerElement.style.display = 'none';
         Module.setStatus = function(text) {
           if (text) Module.printErr('[post-exception status] ' + text);
