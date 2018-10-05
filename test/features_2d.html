@@ -5,6 +5,7 @@
 		<title>OpenCV JS Binding - Image Processing Demo</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
 		<style>
 			body {
 				font-family: Monospace;
@@ -25,6 +26,7 @@
 	<!-- <div id="my_camera" style="width: 640px; height: 480px;"></div> -->
     <div id="my_result" style="display: none;"></div>
     <script type="text/javascript">
+    	let frameRange = 8;
     	var video = document.getElementById('video_camera');
     	var typeCamera = 'environment';
     	initWebcameraStream = typeCamera => {
@@ -70,8 +72,18 @@
 	<canvas id="canvas2"></canvas>
 	<canvas id="canvas3" style="display: none;"></canvas>
 
-	<button onclick="changeCamera()">Переключить камеру</button>
+	<button onclick="changeCamera()" class="btn btn-default btn-lg">Переключить камеру</button>
+	<br>
+	<input type="range" min="1" max="16" value="8" id="framesRange">
+	<p id="curFramesCnt"></p>
 
+	<script type="text/javascript">
+		$('#curFramesCnt').innerHTML = frameRange;
+		$('#framesRange').on('change', function(){
+			frameRange = $('#framesRange').val();
+			$('#curFramesCnt').innerHTML = frameRange;			
+		});
+	</script>
 
 	<!-- <script src='dat.gui.js'></script> -->
 	<script async src="cv-wasm.js"></script>
@@ -151,7 +163,7 @@
 
 			// Initiate STAR detector
 			//var brisk = new cv.BRISK(50, 1, 3);
-			if (frames++ % 12 == 0){
+			if (frames++ % frameRange == 0){
 				var orb = new cv.ORB(500, 1.2, 8, 31, 0, 2, 0, 31, 20);
 
 			// find the keypoints with ORB
