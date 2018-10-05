@@ -71,7 +71,7 @@
 		var prev_key_points = null;
 
 		var ctxCanvas2 = canvas2.getContext('2d'); //e.target.files[0]
-		ctxCanvas2.clearReact(0, 0, width, height);
+		ctxCanvas2.clearRect(0, 0, width, height);
 		show_image = function (mat, canvas_id ){
 			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
 			channels = mat.channels();
