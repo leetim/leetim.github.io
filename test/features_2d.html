@@ -21,10 +21,43 @@
 	</head>
 	<body>
 	<script src="webcam/webcam.js"></script>
-	<div id="my_camera" style="width: 640px; height: 480px;"></div>
+	<video id="video_camera" style="width: 640px; height: 480px" autoplay></video>
+	<!-- <div id="my_camera" style="width: 640px; height: 480px;"></div> -->
     <div id="my_result" style="display: none;"></div>
     <script type="text/javascript">
-    	Webcam.attach('#my_camera');
+    	var video = document.getElementById('video_camera');
+		if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+ 			navigator.mediaDevices.getUserMedia({ video: true /*{ facingMode: { exact: "environment" } }*/ }).then(function(stream) {
+ 				video.src = window.URL.createObjectURL(stream);
+ 				video.play();
+ 			},
+ 			function(err){
+ 				console.log(err);
+ 			});
+		}
+
+		var width = 640;
+        var height = 480;
+
+        function clearphoto() {
+          	var context = canvas.getContext('2d');
+          	context.fillStyle = "#AAA";
+          	context.fillRect(0, 0, width, height);
+
+          	var data = canvas1.toDataURL('image/png');
+        }
+
+        function takepicture() {
+          	var context = canvas1.getContext('2d');
+            canvas1.width = width;
+            canvas1.height = height;
+            context.drawImage(video_camera, 0, 0, width, height);
+
+            var data = canvas1.toDataURL('image/png');
+            handleFiles(data);
+        }
+        setInterval(takepicture, 3000);
+    	//Webcam.attach('#my_camera');
     </script>
 	<div class="spinner" id='spinner'></div>
     <div class="emscripten" id="status">Downloading...</div>
@@ -67,13 +100,13 @@
 			ctx.putImageData(imdata, 0, 0);
 		}
 
-	 	setInterval(handleFiles, 15);
+	 	//setInterval(handleFiles, 15);
 
 		function handleFiles(e) {
-			let url;
+			let url = e;
 
-			Webcam.snap(data_uri => url = data_uri);
-			document.getElementById('my_camera').style.display = 'none';
+			//Webcam.snap(data_uri => url = data_uri);
+			document.getElementById('video_camera').style.display = 'none';
 
 			var canvas = document.getElementById('canvas1');
 			var canvasWidth = Math.min(600, screen.width) ;
