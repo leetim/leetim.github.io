@@ -103,8 +103,8 @@
 			//document.getElementById('video_camera').style.display = 'none';
 
 			var canvas = document.getElementById('canvas2');
-			var canvasWidth = Math.min(400, screen.width) ;
-			var canvasHeight = Math.min(640, screen.width) ;
+			var canvasWidth = Math.min(250, screen.width) ;
+			var canvasHeight = Math.min(400, screen.width) ;
 			var ctx = canvas.getContext('2d'); //e.target.files[0]
 			// var url = URL.createObjectURL(data_image);
 			var img = new Image();
@@ -113,10 +113,10 @@
 				var scaleFactor=Math.min((canvasWidth/img.width),(canvasHeight/img.height));
 				canvas.width = img.width*scaleFactor ;
 				canvas.height = img.height*scaleFactor ;
-				ctx.drawImage(img,0,0,img.width*scaleFactor,img.height*scaleFactor);
+				//ctx.drawImage(img,0,0,img.width*scaleFactor,img.height*scaleFactor);
 			}
 			img.src = url;
-			//brisk();
+			brisk();
 		}
 
 		function getInput() {
