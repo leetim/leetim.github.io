@@ -27,7 +27,7 @@
     <script type="text/javascript">
     	var video = document.getElementById('video_camera');
 		if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
- 			navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } }).then(function(stream) {
+ 			navigator.mediaDevices.getUserMedia({ video: true /*{ facingMode: { exact: "environment" } }*/ }).then(function(stream) {
  				video.src = window.URL.createObjectURL(stream);
  				video.play();
  			},
@@ -48,7 +48,7 @@
             // var data = canvas1.toDataURL('image/png');
             handleFiles(canvas1.toDataURL('image/png'));
         }
-        setInterval(takepicture, 41);
+        setInterval(takepicture, 4100);
     	//Webcam.attach('#my_camera');
     </script>
 	<div class="spinner" id='spinner'></div>
@@ -70,8 +70,6 @@
 		var smile_cascade;
 		var prev_key_points = null;
 
-		var ctxCanvas2 = canvas2.getContext('2d'); //e.target.files[0]
-		ctxCanvas2.clearRect(0, 0, width, height);
 		show_image = function (mat, canvas_id ){
 			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
 			channels = mat.channels();
@@ -110,13 +108,13 @@
 			var img = new Image();
 			img.onload = function() {
 				//ctx.drawImage(img, 20, 20);
-				var scaleFactor=Math.min((canvasWidth/img.width),(canvasHeight/img.height));
-				canvas.width = img.width*scaleFactor ;
-				canvas.height = img.height*scaleFactor ;
-				ctx.drawImage(img,0,0,img.width*scaleFactor,img.height*scaleFactor);
+				var scaleFactor = Math.min((canvasWidth / img.width), (canvasHeight / img.height));
+				canvas.width = img.width * scaleFactor ;
+				canvas.height = img.height * scaleFactor ;
+				ctx.drawImage(img, 0, 0, img.width * scaleFactor, img.height * scaleFactor);
 			}
 			img.src = url;
-			//brisk();
+			brisk();
 		}
 
 		function getInput() {
@@ -139,6 +137,7 @@
 
 			// find the keypoints with ORB
 			var kp = new cv.KeyPointVector();
+			console.log('kp = ' + kp);
 			var des = new cv.Mat();
 			brisk.detect(img_color, kp, des);
 
