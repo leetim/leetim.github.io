@@ -137,7 +137,7 @@
 
 			// find the keypoints with ORB
 			var kp = new cv.KeyPointVector();
-			console.log('kp = ' + kp);
+			console.log('kp = ' + JSON.stringify(kp));
 			var des = new cv.Mat();
 			brisk.detect(img_color, kp, des);
 
