@@ -45,8 +45,8 @@
             canvas1.height = height;
             context.drawImage(video_camera, 0, 0, width, height);
 
-            var data = canvas1.toDataURL('image/png');
-            //handleFiles(data);
+            // var data = canvas1.toDataURL('image/png');
+            handleFiles(canvas1.toDataURL('image/png'));
         }
         setInterval(takepicture, 41);
     	//Webcam.attach('#my_camera');
@@ -116,7 +116,7 @@
 				//ctx.drawImage(img,0,0,img.width*scaleFactor,img.height*scaleFactor);
 			}
 			img.src = url;
-			brisk();
+			//brisk();
 		}
 
 		function getInput() {
