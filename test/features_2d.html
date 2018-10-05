@@ -134,14 +134,17 @@
 
 			// Initiate STAR detector
 			var brisk = new cv.BRISK(50, 1, 3);
+			var orb = new cv.ORB(500, 1.2, 8, 31, 0, 2, 0, 31, 20);
 
 			// find the keypoints with ORB
 			var kp = new cv.KeyPointVector();
 			var des = new cv.Mat();
-			brisk.detect(img_color, kp, des);
+			// brisk.detect(img_color, kp, des);
+			orb.detect(img_color, kp, des);
 
 			// compute the descriptors with ORB
-			brisk.compute(img_color, kp, des);
+			// brisk.compute(img_color, kp, des);
+			orb.compute(img_color, kp, des);
 
 			// draw only keypoints location,not size and orientation
 			var img2 = new cv.Mat();
@@ -152,7 +155,7 @@
 			}
 
 			cv.drawKeypoints(img_color, kp, img2, color, 0);
-			/*
+			
 			if (prev_key_points != null) {
 				// var h = null;
 				// findHomography(points1, points2, h);
@@ -165,12 +168,13 @@
 				prev_key_points.delete();
 				other_color.delete();
 			}
-			*/
+			
 			show_image(img2, "canvas2");
 			//prev_key_points = kp.clone();
 			kp.delete();
 			color.delete();
 			brisk.delete();
+			orb.delete();
 			des.delete();
 			img_color.delete();
 			img2.delete();
