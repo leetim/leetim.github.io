@@ -26,15 +26,19 @@
     <div id="my_result" style="display: none;"></div>
     <script type="text/javascript">
     	var video = document.getElementById('video_camera');
-		if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
- 			navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } }).then(function(stream) {
- 				video.src = window.URL.createObjectURL(stream);
- 				video.play();
- 			},
- 			function(err){
- 				console.log(err);
- 			});
-		}
+    	var typeCamera = 'environment';
+    	initWebcameraStream = typeCamera => {
+    		if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+ 				navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: typeCamera } } }).then(function(stream) {
+ 					video.src = window.URL.createObjectURL(stream);
+ 					video.play();
+ 				},
+ 				function(err){
+ 					console.log(err);
+ 				});
+			}
+    	};
+		initWebcameraStream(typeCamera);
 
 		var width = 250;
         var height = 400;
