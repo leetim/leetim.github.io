@@ -48,11 +48,11 @@
             var data = canvas1.toDataURL('image/png');
             handleFiles(data);
         }
-        setInterval(takepicture, 41);
+        //setInterval(takepicture, 41);
     	//Webcam.attach('#my_camera');
     </script>
 	<div class="spinner" id='spinner'></div>
-    <div class="emscripten" id="status">Downloading...</div>
+    <div class="emscripten" id="status">Загрузка...</div>
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden=1></progress>
     </div>
@@ -98,7 +98,7 @@
 			let url = e;
 
 			//Webcam.snap(data_uri => url = data_uri);
-			document.getElementById('video_camera').style.display = 'none';
+			//document.getElementById('video_camera').style.display = 'none';
 
 			var canvas = document.getElementById('canvas2');
 			var canvasWidth = Math.min(400, screen.width) ;
