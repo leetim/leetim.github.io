@@ -21,7 +21,7 @@
 	</head>
 	<body>
 	<script src="webcam/webcam.js"></script>
-	<video id="video_camera" style="width: 640px; height: 480px" autoplay></video>
+	<video id="video_camera" style="width: 400px; height: 640px" autoplay></video>
 	<!-- <div id="my_camera" style="width: 640px; height: 480px;"></div> -->
     <div id="my_result" style="display: none;"></div>
     <script type="text/javascript">
@@ -109,8 +109,8 @@
 			document.getElementById('video_camera').style.display = 'none';
 
 			var canvas = document.getElementById('canvas2');
-			var canvasWidth = Math.min(600, screen.width) ;
-			var canvasHeight = Math.min(400, screen.width) ;
+			var canvasWidth = Math.min(400, screen.width) ;
+			var canvasHeight = Math.min(640, screen.width) ;
 			var ctx = canvas.getContext('2d'); //e.target.files[0]
 			// var url = URL.createObjectURL(data_image);
 			var img = new Image();
