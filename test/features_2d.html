@@ -145,10 +145,9 @@
 
 			// draw only keypoints location,not size and orientation
 			var img2 = new cv.Mat();
-			var img3 = new cv.Mat();
 			var color = new cv.Scalar(0,255,0);
-			cv.drawKeypoints(img3, kp, img2, color, 0);
-			img3.delete();
+			console.log(JSON.Stringify(img_color));
+			cv.drawKeypoints(img_color, kp, img2, color, 0);
 			/*
 			if (prev_key_points != null) {
 				// var h = null;
