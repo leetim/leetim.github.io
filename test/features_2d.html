@@ -108,7 +108,7 @@
 			//Webcam.snap(data_uri => url = data_uri);
 			document.getElementById('video_camera').style.display = 'none';
 
-			var canvas = document.getElementById('canvas1');
+			var canvas = document.getElementById('canvas2');
 			var canvasWidth = Math.min(600, screen.width) ;
 			var canvasHeight = Math.min(400, screen.width) ;
 			var ctx = canvas.getContext('2d'); //e.target.files[0]
@@ -123,7 +123,7 @@
 				ctx.drawImage(img,0,0,img.width*scaleFactor,img.height*scaleFactor);
 			}
 			img.src = url;
-			brisk();
+			//brisk();
 		}
 
 		function getInput() {
