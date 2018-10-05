@@ -58,7 +58,7 @@
     </div>
 
 	<canvas id="canvas1" style="display: none;"></canvas>
-	<canvas id="canvas2" style="position: absolute; top: 0; left: 0;"></canvas>
+	<canvas id="canvas2"></canvas>
 	<canvas id="canvas3" style="display: none;"></canvas>
 
 	<!-- <script src='dat.gui.js'></script> -->
@@ -100,7 +100,7 @@
 			let url = e;
 
 			//Webcam.snap(data_uri => url = data_uri);
-			//document.getElementById('video_camera').style.display = 'none';
+			document.getElementById('video_camera').style.display = 'none';
 
 			var canvas = document.getElementById('canvas2');
 			var canvasWidth = Math.min(250, screen.width) ;
