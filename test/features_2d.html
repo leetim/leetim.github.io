@@ -147,8 +147,8 @@
 			var img2 = new cv.Mat();
 			var color = new cv.Scalar(0,255,0);
 
-			for (key in kp){
-				console.log(key + ' ' + kp[key]);
+			for (key in des){
+				console.log(key + ' ' + des[key]);
 			}
 
 			cv.drawKeypoints(img_color, kp, img2, color, 0);
