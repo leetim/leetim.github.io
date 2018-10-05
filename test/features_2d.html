@@ -78,11 +78,9 @@
 	<p id="curFramesCnt"></p>
 
 	<script type="text/javascript">
-		$('#curFramesCnt').test(frameRange);
+		$('#curFramesCnt').text(frameRange);
 		$('#framesRange').on('change', function(){
 			frameRange = $('#framesRange').val();
-			$('#curFramesCnt').text(frameRange);
-			console.log(frameRange);			
 		});
 	</script>
 
