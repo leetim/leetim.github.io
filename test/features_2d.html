@@ -40,6 +40,11 @@
     	};
 		initWebcameraStream(typeCamera);
 
+		changeCamera = () => {
+			typeCamera = (typeCamera == 'user') ? 'environment' : 'user';
+			initWebcameraStream(typeCamera);
+		}
+
 		var width = 250;
         var height = 400;
 
@@ -64,6 +69,9 @@
 	<canvas id="canvas1" style="display: none;"></canvas>
 	<canvas id="canvas2"></canvas>
 	<canvas id="canvas3" style="display: none;"></canvas>
+
+	<button onclick="changeCamera()">Переключить камеру</button>
+
 
 	<!-- <script src='dat.gui.js'></script> -->
 	<script async src="cv-wasm.js"></script>
