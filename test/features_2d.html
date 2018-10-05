@@ -129,7 +129,7 @@
 		function getInput() {
 			var canvas = document.getElementById('canvas1');
 			var ctx = canvas.getContext('2d');
-			var imgData = ctx.getImageData(0,0,canvas.width, canvas.height);
+			var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 			return imgData;
 		}
 
@@ -258,12 +258,12 @@
 			gui.domElement.style.right = "5px";
 
 			//Color Space Changed
-			var cornereFolder = gui.addFolder('Corner Detectoin');
-			cornereFolder.add(Control, 'threshold' ).min(120).max(255);
-			cornereFolder.add(Control, 'maxCorners' ).min(1).max(50);
+			// var cornereFolder = gui.addFolder('Corner Detectoin');
+			// cornereFolder.add(Control, 'threshold' ).min(120).max(255);
+			// cornereFolder.add(Control, 'maxCorners' ).min(1).max(50);
 
-			var orbFolder = gui.addFolder('BRISK Feature Extraction');
-			orbFolder.add(Control,'brisk');
+			// var orbFolder = gui.addFolder('BRISK Feature Extraction');
+			// orbFolder.add(Control,'brisk');
 		}
 
 		init();
