@@ -98,8 +98,11 @@
 		let need_points = false;
 
 		var canvas2Event = document.getElementById('canvas2');
+		var changeNeed = () => need_points = !need_points;
 		canvas2Event.addEventListener('click', function(event){
 			need_points = !need_points;
+			setTimeout(changeNeed, 5000);
+			setTimeout(changeNeed, 1000);
 		});
 
 		show_image = function (mat, canvas_id ){
