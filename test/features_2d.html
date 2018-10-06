@@ -95,6 +95,12 @@
 		var smile_cascade;
 		var prev_key_points = null;
 		let frames = 0;
+		let need_points = false;
+
+		var canvas2Event = document.getElementById('canvas2');
+		canvas2Event.addEventListener('click', function(event){
+			need_points = !need_points;
+		});
 
 		show_image = function (mat, canvas_id ){
 			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
@@ -141,7 +147,8 @@
 			}
 			img.src = url;
 			
-			brisk();
+			if (need_points)
+				brisk();
 			//brisk();
 		}
 
