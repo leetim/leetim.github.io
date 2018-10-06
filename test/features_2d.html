@@ -42,21 +42,17 @@
 			}
     	};
 		initWebcameraStream(typeCamera);
-
 		changeCamera = () => {
 			typeCamera = (typeCamera == 'user') ? 'environment' : 'user';
 			initWebcameraStream(typeCamera);
 		}
-
 		var width = 300;
         var height = 400;
-
         function takepicture() {
           	var context = canvas1.getContext('2d');
             canvas1.width = width;
             canvas1.height = height;
             context.drawImage(video_camera, 0, 0, width, height);
-
             // var data = canvas1.toDataURL('image/png');
             handleFiles(canvas1.toDataURL('image/png'));
         }
@@ -96,28 +92,20 @@
 		var prev_key_points = null;
 		let frames = 0;
 		let need_points = false;
-
 		var canvas2Event = document.getElementById('canvas2');
-		var changeNeed = () => need_points = !need_points;
 		canvas2Event.addEventListener('click', function(event){
 			need_points = !need_points;
-			setTimeout(changeNeed, 5000);
-			setTimeout(changeNeed, 8000);
 		});
-
 		show_image = function (mat, canvas_id ){
 			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
 			channels = mat.channels();
 			channelSize = mat.elemSize1();
-
 			var canvas = document.getElementById(canvas_id);
 			ctx = canvas.getContext("2d");
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			canvas.width = mat.cols;
 			canvas.height = mat.rows;
-
 			imdata = ctx.createImageData(mat.cols, mat.rows);
-
 			for (var i = 0, j = 0; i < data.length; i += channels, j+=4) {
 				imdata.data[j] = data[i];
 				imdata.data[j + 1] = data[i+1%channels];
@@ -126,15 +114,11 @@
 			}
 			ctx.putImageData(imdata, 0, 0);
 		}
-
 	 	//setInterval(handleFiles, 15);
-
 		function handleFiles(e) {
 			let url = e;
-
 			//Webcam.snap(data_uri => url = data_uri);
 			document.getElementById('video_camera').style.display = 'none';
-
 			var canvas = document.getElementById('canvas2');
 			var canvasWidth = Math.min(300, screen.width) ;
 			var canvasHeight = Math.min(400, screen.width) ;
@@ -155,57 +139,34 @@
 				brisk();
 			//brisk();
 		}
-
 		function getInput() {
 			var canvas = document.getElementById('canvas1');
 			var ctx = canvas.getContext('2d');
 			var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 			return imgData;
 		}
-
 		var prev_key_points = null;
-		var prev_meanx = null;
-		var prev_meany = null;
 		function brisk() {
 			var img = cv.matFromArray(getInput(), 24); // 24 for rgba
 			var img_color = new cv.Mat(); // Opencv likes RGB
 			cv.cvtColor(img, img_color, cv.ColorConversionCodes.COLOR_RGBA2RGB.value, 0);
-			var crcColor = new cv.Scalar(0, 255, 0, 0);
-
 			img.delete();
 			var img2 = new cv.Mat();
 			var color = new cv.Scalar(0, 255, 0);
-
 			// Initiate STAR detector
 			//var brisk = new cv.BRISK(50, 1, 3);
 			if (frames++ % frameRange == 0){
 				var orb = new cv.ORB(500, 1.2, 8, 31, 0, 2, 0, 31, 20);
-
 			// find the keypoints with ORB
 				var kp = new cv.KeyPointVector();
 				var des = new cv.Mat();
 			// brisk.detect(img_color, kp, des);
 				orb.detect(img_color, kp, des);
-
 			// compute the descriptors with ORB
 			// brisk.compute(img_color, kp, des);
 				orb.compute(img_color, kp, des);
-
 			// draw only keypoints location,not size and orientation
-
-				// cv.drawKeypoints(img_color, kp, img2, color, 0);
-				let meanx = 0, meany = 0;
-				for (let i = 0; i < kp.size(); i++) {
-					meanx += kp.get(i).pt[0];
-					meany += kp.get(i).pt[1];
-				}
-				if (kp.size() > 0) {
-					meanx /= kp.size();
-					meany /= kp.size();
-				}
-				cv.circle(img_color, [meanx, meany], 40, crcColor, 2, 0, 0);
-				prev_meanx = meanx;
-				prev_meany = meany;
+				cv.drawKeypoints(img_color, kp, img2, color, 0);
 			/*
 			if (prev_key_points != null) {
 				// var h = null;
@@ -220,85 +181,66 @@
 				other_color.delete();
 			}
 			*/
-
-				show_image(img_color, "canvas2");
+				show_image(img2, "canvas2");
 				prev_key_points = kp.clone();
 				kp.delete();
 				orb.delete();
 				des.delete();
 			}
 			else {
-				// cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
-				cv.circle(img_color, [prev_meanx, prev_meany], 40, crcColor, 2, 0, 0);
-				show_image(img_color, "canvas2");
+				cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
+				show_image(img2, "canvas2");
 			}
-
 			color.delete();
 			//brisk.delete();
 			img_color.delete();
 			img2.delete();
-			crcColor.delete();
 		}
-
 		function download() {
 			var dt = canvas2.toDataURL('image/jpeg');
 			this.href = dt;
 		};
 		//downloadLnk.addEventListener('click', download, false);
-
 		var ress = [];
-
 		function convertArrayOfObjectsToCSV(args) {
 			var result, ctr, keys, columnDelimiter, lineDelimiter, data;
-
 			data = args.data || null;
 			if (data == null || !data.length) {
 				return null;
 			}
-
 			columnDelimiter = args.columnDelimiter || ',';
 			lineDelimiter = args.lineDelimiter || '\n';
-
 			keys = Object.keys(data[0]);
-
 			result = '';
 			result += keys.join(columnDelimiter);
 			result += lineDelimiter;
-
 			data.forEach(function(item) {
 				ctr = 0;
 				keys.forEach(function(key) {
 					if (ctr > 0) result += columnDelimiter;
-
 					result += item[key];
 					ctr++;
 				});
 				result += lineDelimiter;
 			});
-
 			return result;
 		}
-
 		function downloadCSV(args) {
 			var data, filename, link;
 			var csv = convertArrayOfObjectsToCSV({
 				data: ress
 			});
 			if (csv == null) return;
-
 			filename = args.filename || 'export.csv';
-
 			if (!csv.match(/^data:text\/csv/i)) {
 				csv = 'data:text/csv;charset=utf-8,' + csv;
 			}
 			data = encodeURI(csv);
-
 			link = document.createElement('a');
 			link.setAttribute('href', data);
 			link.setAttribute('download', filename);
 			link.click();
 		}
-
 			var container ;
 			var Zee ;
 			var Control =  {
@@ -306,37 +248,29 @@
 				maxCorners : 10 ,
 				brisk : brisk
 			};
-
 		function init() {
 			container = document.createElement('div');
 			document.body.appendChild(container);
-
 			gui = new dat.GUI({autoPlace: false});
 			document.body.appendChild(gui.domElement);
 			gui.domElement.style.position = "absolute";
 			gui.domElement.style.top = "-50px";
 			gui.domElement.style.right = "5px";
-
 			//Color Space Changed
 			// var cornereFolder = gui.addFolder('Corner Detectoin');
 			// cornereFolder.add(Control, 'threshold' ).min(120).max(255);
 			// cornereFolder.add(Control, 'maxCorners' ).min(1).max(50);
-
 			// var orbFolder = gui.addFolder('BRISK Feature Extraction');
 			// orbFolder.add(Control,'brisk');
 		}
-
 		init();
-
 		</script>
 		<script  type='text/javascript'>
-
 	    function getCV() {
 			var zip ;
 			var oReq = new XMLHttpRequest();
 			oReq.open("GET", "/opencvjs/examples/cv.js.gz", "application/x-gzip");
 			oReq.responseType = "arraybuffer";
-
 			oReq.onload = function (oEvent) {
 			  var arrayBuffer = oReq.response; // Note: not oReq.responseText
 			  if (arrayBuffer) {
@@ -357,10 +291,7 @@
 					head.appendChild(script);
 					console.log("script added");
 			  }
-
-
 			};
-
 			oReq.send(null);
 		}
 		var statusElement = document.getElementById('status');
