@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>OpenCV JS Binding - Image Processing Demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #336677;
+				margin: 0px;
+			}
+	        canvas{
+				background-color: #999999;
+			}
+			a {
+				color: #0040ff;
+			}
+		</style>
+	</head>
+	<body>
+	<script src="webcam/webcam.js"></script>
+	<script src="jqueryWebcam/jquery.js"></script>
+	<video id="video_camera" style="width: 300px; height: 400px" autoplay></video>
+	<!-- <div id="my_camera" style="width: 640px; height: 480px;"></div> -->
+    <div id="my_result" style="display: none;"></div>
+    <script type="text/javascript">
+    	let frameRange = 8;
+    	var video = document.getElementById('video_camera');
+    	var typeCamera = 'environment';
+    	initWebcameraStream = typeCamera => {
+    		if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+ 				navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: typeCamera } } }).then(function(stream) {
+ 					video.src = window.URL.createObjectURL(stream);
+ 					video.play();
+ 				},
+ 				function(err){
+ 					console.log(err);
+ 				});
+			}
+    	};
+		initWebcameraStream(typeCamera);
+		changeCamera = () => {
+			typeCamera = (typeCamera == 'user') ? 'environment' : 'user';
+			initWebcameraStream(typeCamera);
+		}
+		var width = 300;
+        var height = 400;
+        function takepicture() {
+          	var context = canvas1.getContext('2d');
+            canvas1.width = width;
+            canvas1.height = height;
+            context.drawImage(video_camera, 0, 0, width, height);
+            // var data = canvas1.toDataURL('image/png');
+            handleFiles(canvas1.toDataURL('image/png'));
+        }
+        setInterval(takepicture, 41);
+    	//Webcam.attach('#my_camera');
+    </script>
+	<div class="spinner" id='spinner' style="display: none;"></div>
+    <div class="emscripten" id="status" style="display: none;">Загрузка...</div>
+    <div class="emscripten" style="display: none;">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
+
+	<canvas id="canvas1" style="display: none;"></canvas>
+	<canvas id="canvas2"></canvas>
+	<canvas id="canvas3" style="display: none;"></canvas>
+
+	<button onclick="changeCamera()" class="btn btn-default btn-lg text-center">Переключить камеру</button>
+	<br>
+	<h3 id="curFramesCnt" style="color: white;" align="center"></h3>
+	<input type="range" min="1" max="16" value="8" id="framesRange">
+
+	<script type="text/javascript">
+		$('#curFramesCnt').text(frameRange);
+		$('#framesRange').on('change', function(){
+			frameRange = $('#framesRange').val();
+			$('#curFramesCnt').text(frameRange);
+		});
+	</script>
+
+	<!-- <script src='dat.gui.js'></script> -->
+	<script async src="cv-wasm.js"></script>
+
+	<script>
+		var face_cascade;
+  		var eye_cascade;
+		var smile_cascade;
+		var prev_key_points = null;
+		let frames = 0;
+		let need_points = true;
+		var canvas2Event = document.getElementById('canvas2');
+		canvas2Event.addEventListener('click', function(event){
+			need_points = !need_points;
+		});
+		show_image = function (mat, canvas_id ){
+			var data = mat.data(); 	// output is a Uint8Array that aliases directly into the Emscripten heap
+			channels = mat.channels();
+			channelSize = mat.elemSize1();
+			var canvas = document.getElementById(canvas_id);
+			ctx = canvas.getContext("2d");
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			canvas.width = mat.cols;
+			canvas.height = mat.rows;
+			imdata = ctx.createImageData(mat.cols, mat.rows);
+			for (var i = 0, j = 0; i < data.length; i += channels, j+=4) {
+				imdata.data[j] = data[i];
+				imdata.data[j + 1] = data[i+1%channels];
+				imdata.data[j + 2] = data[i+2%channels];
+				imdata.data[j + 3] = 255;
+			}
+			ctx.putImageData(imdata, 0, 0);
+		}
+	 	//setInterval(handleFiles, 15);
+		function handleFiles(e) {
+			let url = e;
+			//Webcam.snap(data_uri => url = data_uri);
+			document.getElementById('video_camera').style.display = 'none';
+			var canvas = document.getElementById('canvas2');
+			var canvasWidth = Math.min(300, screen.width) ;
+			var canvasHeight = Math.min(400, screen.width) ;
+			var ctx = canvas.getContext('2d'); //e.target.files[0]
+			// var url = URL.createObjectURL(data_image);
+			var img = new Image();
+			img.onload = function() {
+				//ctx.drawImage(img, 20, 20);
+				//var scaleFactor = Math.min((canvasWidth / img.width), (canvasHeight / img.height));
+				canvas.width = img.width;// * scaleFactor ;
+				canvas.height = img.height;// * scaleFactor ;
+				ctx.drawImage(img, 0, 0, img.width, img.height);
+				// ctx.drawImage(img, 0, 0, img.width * scaleFactor, img.height * scaleFactor);
+			}
+			img.src = url;
+			
+			if (need_points)
+				brisk();
+			//brisk();
+		}
+		function getInput() {
+			var canvas = document.getElementById('canvas1');
+			var ctx = canvas.getContext('2d');
+			var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+			return imgData;
+		}
+		var prev_key_points = null;
+		function brisk() {
+			var img = cv.matFromArray(getInput(), 24); // 24 for rgba
+			var img_color = new cv.Mat(); // Opencv likes RGB
+			cv.cvtColor(img, img_color, cv.ColorConversionCodes.COLOR_RGBA2RGB.value, 0);
+			img.delete();
+			var img2 = new cv.Mat();
+			var color = new cv.Scalar(0, 255, 0);
+			// Initiate STAR detector
+			//var brisk = new cv.BRISK(50, 1, 3);
+			if (frames++ % frameRange == 0){
+				var orb = new cv.ORB(500, 1.2, 8, 31, 0, 2, 0, 31, 20);
+			// find the keypoints with ORB
+				var kp = new cv.KeyPointVector();
+				var des = new cv.Mat();
+			// brisk.detect(img_color, kp, des);
+				orb.detect(img_color, kp, des);
+			// compute the descriptors with ORB
+			// brisk.compute(img_color, kp, des);
+				orb.compute(img_color, kp, des);
+			// draw only keypoints location,not size and orientation
+				cv.drawKeypoints(img_color, kp, img2, color, 0);
+			/*
+			if (prev_key_points != null) {
+				// var h = null;
+				// findHomography(points1, points2, h);
+				var other_color = new cv.Scalar(255,255,0);
+				// console.log(h);
+				var img3 = new cv.Mat();
+				cv.drawKeypoints(img_color, prev_key_points, img3, other_color, 0);
+				show_image(img3, "canvas3");
+				img3.delete();
+				prev_key_points.delete();
+				other_color.delete();
+			}
+			*/
+				show_image(img2, "canvas2");
+				prev_key_points = kp.clone();
+				kp.delete();
+				orb.delete();
+				des.delete();
+			}
+			else {
+				cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
+				show_image(img2, "canvas2");
+			}
+			color.delete();
+			//brisk.delete();
+			img_color.delete();
+			img2.delete();
+		}
+		function download() {
+			var dt = canvas2.toDataURL('image/jpeg');
+			this.href = dt;
+		};
+		//downloadLnk.addEventListener('click', download, false);
+		var ress = [];
+		function convertArrayOfObjectsToCSV(args) {
+			var result, ctr, keys, columnDelimiter, lineDelimiter, data;
+			data = args.data || null;
+			if (data == null || !data.length) {
+				return null;
+			}
+			columnDelimiter = args.columnDelimiter || ',';
+			lineDelimiter = args.lineDelimiter || '\n';
+			keys = Object.keys(data[0]);
+			result = '';
+			result += keys.join(columnDelimiter);
+			result += lineDelimiter;
+			data.forEach(function(item) {
+				ctr = 0;
+				keys.forEach(function(key) {
+					if (ctr > 0) result += columnDelimiter;
+					result += item[key];
+					ctr++;
+				});
+				result += lineDelimiter;
+			});
+			return result;
+		}
+		function downloadCSV(args) {
+			var data, filename, link;
+			var csv = convertArrayOfObjectsToCSV({
+				data: ress
+			});
+			if (csv == null) return;
+			filename = args.filename || 'export.csv';
+			if (!csv.match(/^data:text\/csv/i)) {
+				csv = 'data:text/csv;charset=utf-8,' + csv;
+			}
+			data = encodeURI(csv);
+			link = document.createElement('a');
+			link.setAttribute('href', data);
+			link.setAttribute('download', filename);
+			link.click();
+		}
+			var container ;
+			var Zee ;
+			var Control =  {
+				threshold : 200 ,
+				maxCorners : 10 ,
+				brisk : brisk
+			};
+		function init() {
+			container = document.createElement('div');
+			document.body.appendChild(container);
+			gui = new dat.GUI({autoPlace: false});
+			document.body.appendChild(gui.domElement);
+			gui.domElement.style.position = "absolute";
+			gui.domElement.style.top = "-50px";
+			gui.domElement.style.right = "5px";
+			//Color Space Changed
+			// var cornereFolder = gui.addFolder('Corner Detectoin');
+			// cornereFolder.add(Control, 'threshold' ).min(120).max(255);
+			// cornereFolder.add(Control, 'maxCorners' ).min(1).max(50);
+			// var orbFolder = gui.addFolder('BRISK Feature Extraction');
+			// orbFolder.add(Control,'brisk');
+		}
+		init();
+		</script>
+		<script  type='text/javascript'>
+	    function getCV() {
+			var zip ;
+			var oReq = new XMLHttpRequest();
+			oReq.open("GET", "/opencvjs/examples/cv.js.gz", "application/x-gzip");
+			oReq.responseType = "arraybuffer";
+			oReq.onload = function (oEvent) {
+			  var arrayBuffer = oReq.response; // Note: not oReq.responseText
+			  if (arrayBuffer) {
+					zip = new Uint8Array(arrayBuffer);
+					console.log("decompressing script");
+					var decompressed = Zee.decompress(zip);
+					console.log("script decompressed");
+					var head= document.getElementsByTagName('head')[0];
+					var script= document.createElement('script');
+					script.type= 'text/javascript';
+					var length = decompressed.length ;
+					//fr = new FileReader();
+					// fr.readAsText(decompressed);
+					//var x = fr.result;
+					//script.text = decompressed.join();
+					decoder = new TextDecoder();
+					script.text = decoder.decode(decompressed);
+					head.appendChild(script);
+					console.log("script added");
+			  }
+			};
+			oReq.send(null);
+		}
+		var statusElement = document.getElementById('status');
+		var progressElement = document.getElementById('progress');
+		var spinnerElement = document.getElementById('spinner');
+		var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function() {
+          var element = document.getElementById('output');
+          if (element) element.value = ''; // clear browser cache
+          return function(text) {
+            text = Array.prototype.slice.call(arguments).join(' ');
+            // These replacements are necessary if you render to raw HTML
+            //text = text.replace(/&/g, "&amp;");
+            //text = text.replace(/</g, "&lt;");
+            //text = text.replace(/>/g, "&gt;");
+            //text = text.replace('\n', '<br>', 'g');
+            console.log(text);
+            if (element) {
+              element.value += text + "\n";
+              element.scrollTop = element.scrollHeight; // focus on bottom
+            }
+          };
+        })(),
+        printErr: function(text) {
+          text = Array.prototype.slice.call(arguments).join(' ');
+          if (0) { // XXX disabled for safety typeof dump == 'function') {
+            dump(text + '\n'); // fast, straight to the real console
+          } else {
+            console.error(text);
+          }
+        },
+        canvas: (function() {
+          var canvas = document.getElementById('resCanvas');
+          return canvas;
+        })(),
+        setStatus: function(text) {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Date.now() < 30) return; // if this is a progress update, skip it if too soon
+          if (m) {
+            text = m[1];
+            progressElement.value = parseInt(m[2])*100;
+            progressElement.max = parseInt(m[4])*100;
+            progressElement.hidden = false;
+            spinnerElement.hidden = false;
+          } else {
+            progressElement.value = null;
+            progressElement.max = null;
+            progressElement.hidden = true;
+            if (!text) spinnerElement.style.display = 'none';
+          }
+          statusElement.innerHTML = text;
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      //Module.setStatus('Downloading...');
+      window.onerror = function(event) {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        //Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) Module.printErr('[post-exception status] ' + text);
+        };
+      };
+	</script>
+	</body>
+</html>
