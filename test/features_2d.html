@@ -161,10 +161,13 @@
 		}
 
 		var prev_key_points = null;
+		var prev_meanx = null;
+		var prev_meany = null;
 		function brisk() {
 			var img = cv.matFromArray(getInput(), 24); // 24 for rgba
 			var img_color = new cv.Mat(); // Opencv likes RGB
 			cv.cvtColor(img, img_color, cv.ColorConversionCodes.COLOR_RGBA2RGB.value, 0);
+			var crcColor = new cv.Scalar(0, 255, 0, 0);
 
 			img.delete();
 			var img2 = new cv.Mat();
@@ -187,7 +190,19 @@
 
 			// draw only keypoints location,not size and orientation
 
-				cv.drawKeypoints(img_color, kp, img2, color, 0);
+				// cv.drawKeypoints(img_color, kp, img2, color, 0);
+				let meanx = 0, meany = 0;
+				for (let i = 0; i < kp.size(); i++) {
+					meanx += kp.get(i).pt[0];
+					meany += kp.get(i).pt[1];
+				}
+				if (kp.size() > 0) {
+					meanx /= kp.size();
+					meany /= kp.size();
+				}
+				cv.circle(img2, [meanx, meany], 40, crcColor, 2, 0, 0);
+				prev_meanx = meanx;
+				prev_meany = meany;
 			/*
 			if (prev_key_points != null) {
 				// var h = null;
@@ -209,7 +224,8 @@
 				des.delete();
 			}
 			else {
-				cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
+				// cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
+				cv.circle(img2, [prev_meanx, prev_meany], 40, crcColor, 2, 0, 0);
 				show_image(img2, "canvas2");
 			}
 
@@ -217,6 +233,7 @@
 			//brisk.delete();
 			img_color.delete();
 			img2.delete();
+			crcColor.delete();
 		}
 
 		function download() {
