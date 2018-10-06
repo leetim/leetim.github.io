@@ -23,7 +23,7 @@
 	<body>
 	<script src="webcam/webcam.js"></script>
 	<script src="jqueryWebcam/jquery.js"></script>
-	<video id="video_camera" style="width: 250px; height: 400px" autoplay></video>
+	<video id="video_camera" style="width: 300px; height: 400px" autoplay></video>
 	<!-- <div id="my_camera" style="width: 640px; height: 480px;"></div> -->
     <div id="my_result" style="display: none;"></div>
     <script type="text/javascript">
@@ -48,7 +48,7 @@
 			initWebcameraStream(typeCamera);
 		}
 
-		var width = 250;
+		var width = 300;
         var height = 400;
 
         function takepicture() {
@@ -133,7 +133,7 @@
 			document.getElementById('video_camera').style.display = 'none';
 
 			var canvas = document.getElementById('canvas2');
-			var canvasWidth = Math.min(250, screen.width) ;
+			var canvasWidth = Math.min(300, screen.width) ;
 			var canvasHeight = Math.min(400, screen.width) ;
 			var ctx = canvas.getContext('2d'); //e.target.files[0]
 			// var url = URL.createObjectURL(data_image);
