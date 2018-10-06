@@ -200,7 +200,7 @@
 					meanx /= kp.size();
 					meany /= kp.size();
 				}
-				cv.circle(img2, [meanx, meany], 40, crcColor, 2, 0, 0);
+				cv.circle(img_color, [meanx, meany], 40, crcColor, 2, 0, 0);
 				prev_meanx = meanx;
 				prev_meany = meany;
 			/*
@@ -217,7 +217,8 @@
 				other_color.delete();
 			}
 			*/
-				show_image(img2, "canvas2");
+
+				show_image(img_color, "canvas2");
 				prev_key_points = kp.clone();
 				kp.delete();
 				orb.delete();
@@ -225,8 +226,8 @@
 			}
 			else {
 				// cv.drawKeypoints(img_color, prev_key_points, img2, color, 0);
-				cv.circle(img2, [prev_meanx, prev_meany], 40, crcColor, 2, 0, 0);
-				show_image(img2, "canvas2");
+				cv.circle(img_color, [prev_meanx, prev_meany], 40, crcColor, 2, 0, 0);
+				show_image(img_color, "canvas2");
 			}
 
 			color.delete();
